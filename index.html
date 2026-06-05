@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coklu Yapay Zeka Konseyi</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --muted: #64748b;
+        --text: #1f2937;
+        --line: #d9e1ec;
+        --accent: #0f766e;
+        --accent-dark: #115e59;
+        --danger: #b42318;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 20px;
+      }
+
+      .workspace,
+      .sidebar {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .workspace {
+        padding: 24px;
+      }
+
+      .sidebar {
+        align-self: start;
+        padding: 20px;
+      }
+
+      .topbar,
+      .answer-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .topbar {
+        margin-bottom: 24px;
+      }
+
+      .eyebrow {
+        margin: 0 0 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      .status {
+        min-width: 120px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: #eef2f7;
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .status.ok {
+        color: var(--accent-dark);
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        resize: vertical;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text);
+        font: inherit;
+        line-height: 1.5;
+      }
+
+      textarea:focus {
+        outline: 2px solid rgba(15, 118, 110, 0.24);
+        border-color: var(--accent);
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      button {
+        min-height: 40px;
+        padding: 0 16px;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        background: var(--accent);
+        color: #ffffff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        background: #ffffff;
+        color: var(--accent-dark);
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.72;
+      }
+
+      .result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 20px 0;
+      }
+
+      .metric {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcfe;
+      }
+
+      .metric span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .metric strong {
+        overflow-wrap: anywhere;
+        font-size: 18px;
+      }
+
+      .answer-zone {
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+
+      .answer-header {
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      #loadingText {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      pre {
+        min-height: 220px;
+        margin: 0;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #0f172a;
+        color: #e5eefb;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-family: Consolas, "Courier New", monospace;
+        line-height: 1.5;
+      }
+
+      .sidebar ul {
+        margin: 16px 0 0;
+        padding-left: 20px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      @media (max-width: 840px) {
+        .shell {
+          grid-template-columns: 1fr;
+          padding: 18px 12px;
+        }
+
+        .workspace {
+          padding: 18px;
+        }
+
+        .topbar,
+        .answer-header {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .result-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Local Flask API: http://127.0.0.1:7860</p>
+            <h1>Coklu Yapay Zeka Konseyi</h1>
+          </div>
+          <div class="status" id="healthStatus">Kontrol ediliyor</div>
+        </header>
+
+        <section>
+          <label for="prompt">Metin veya komut</label>
+          <textarea id="prompt" rows="8" placeholder="Ornek: Python ile dosya okuyan temiz bir fonksiyon yaz."></textarea>
+          <div class="actions">
+            <button id="runButton" type="button">Calistir</button>
+            <button id="clearButton" type="button" class="secondary">Temizle</button>
+          </div>
+        </section>
+
+        <section class="result-grid" aria-live="polite">
+          <article class="metric">
+            <span>Niyet</span>
+            <strong id="intentValue">-</strong>
+          </article>
+          <article class="metric">
+            <span>Duygu</span>
+            <strong id="sentimentValue">-</strong>
+          </article>
+        </section>
+
+        <section class="answer-zone">
+          <div class="answer-header">
+            <h2>Cevap</h2>
+            <span id="loadingText"></span>
+          </div>
+          <pre id="answerValue">Once run_web.bat calistir, sonra bu HTML dosyasindan istek gonderebilirsin.</pre>
+        </section>
+      </section>
+
+      <aside class="sidebar">
+        <h2>Yetenekler</h2>
+        <ul>
+          <li>Duygu analizi</li>
+          <li>Niyet anlama</li>
+          <li>Ozetleme</li>
+          <li>Ceviri</li>
+          <li>Kod uretimi / hata duzeltme</li>
+          <li>Arastirma derleme</li>
+        </ul>
+      </aside>
+    </main>
+
+    <script>
+      const apiBase = "http://127.0.0.1:7860";
+      const promptInput = document.querySelector("#prompt");
+      const runButton = document.querySelector("#runButton");
+      const clearButton = document.querySelector("#clearButton");
+      const healthStatus = document.querySelector("#healthStatus");
+      const intentValue = document.querySelector("#intentValue");
+      const sentimentValue = document.querySelector("#sentimentValue");
+      const answerValue = document.querySelector("#answerValue");
+      const loadingText = document.querySelector("#loadingText");
+
+      async function checkHealth() {
+        try {
+          const response = await fetch(`${apiBase}/api/health`);
+          const data = await response.json();
+          if (!data.ok) {
+            throw new Error(data.error || "Baslatma hatasi");
+          }
+          healthStatus.textContent = "Hazir";
+          healthStatus.className = "status ok";
+        } catch (error) {
+          healthStatus.textContent = "run_web.bat gerekli";
+          healthStatus.className = "status error";
+        }
+      }
+
+      async function runPrompt() {
+        const text = promptInput.value.trim();
+        if (!text) {
+          answerValue.textContent = "Lutfen once bir metin gir.";
+          return;
+        }
+
+        runButton.disabled = true;
+        loadingText.textContent = "Modeller calisiyor...";
+        answerValue.textContent = "";
+        intentValue.textContent = "-";
+        sentimentValue.textContent = "-";
+
+        try {
+          const response = await fetch(`${apiBase}/api/run`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+          });
+          const data = await response.json();
+          if (!data.ok) {
+            throw new Error(data.error || "Bilinmeyen hata");
+          }
+          intentValue.textContent = data.intent || "-";
+          sentimentValue.textContent = data.sentiment || "-";
+          answerValue.textContent = data.answer || "Cevap bos geldi.";
+        } catch (error) {
+          answerValue.textContent = `Hata: ${error.message}`;
+        } finally {
+          runButton.disabled = false;
+          loadingText.textContent = "";
+        }
+      }
+
+      function clearForm() {
+        promptInput.value = "";
+        intentValue.textContent = "-";
+        sentimentValue.textContent = "-";
+        answerValue.textContent = "Once run_web.bat calistir, sonra bu HTML dosyasindan istek gonderebilirsin.";
+      }
+
+      runButton.addEventListener("click", runPrompt);
+      clearButton.addEventListener("click", clearForm);
+      promptInput.addEventListener("keydown", (event) => {
+        if (event.ctrlKey && event.key === "Enter") {
+          runPrompt();
+        }
+      });
+
+      checkHealth();
+    </script>
+  </body>
+</html>

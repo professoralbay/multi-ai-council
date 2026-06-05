@@ -1,0 +1,46 @@
+providers:
+  primary: huggingface
+  research: duckduckgo
+
+models:
+  sentiment:
+    task: text-classification
+    model: savasy/bert-base-turkish-sentiment-cased
+  intent:
+    task: zero-shot-classification
+    model: MoritzLaurer/mDeBERTa-v3-base-mnli-xnli
+    labels:
+      - duygu_analizi
+      - niyet_anlama
+      - ozetleme
+      - ceviri
+      - kod_uretimi
+      - hata_duzeltme
+      - arastirma
+      - konsey
+      - genel_sohbet
+  summarization:
+    task: summarization
+    model: csebuetnlp/mT5_multilingual_XLSum
+  translation:
+    task: translation
+    model: facebook/nllb-200-distilled-600M
+  coding:
+    task: chat-completion
+    model: Qwen/Qwen2.5-Coder-7B-Instruct
+  research_synthesis:
+    task: chat-completion
+    model: Qwen/Qwen2.5-Coder-7B-Instruct
+  council:
+    task: council
+    members:
+      - role: arastirmaci
+        model: google/gemma-2-9b-it
+      - role: analist
+        model: meta-llama/Llama-3.1-8B-Instruct
+      - role: elestirmen
+        model: mistralai/Mistral-7B-Instruct-v0.3
+      - role: sentezleyici
+        model: Qwen/Qwen2.5-7B-Instruct
+      - role: denetleyici
+        model: microsoft/Phi-3-medium-128k-instruct

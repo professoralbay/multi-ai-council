@@ -1,0 +1,6 @@
+huggingface_hub==0.34.4
+python-dotenv==1.0.1
+PyYAML==6.0.2
+duckduckgo-search==6.3.7
+rich==13.9.4
+Flask==3.0.3
