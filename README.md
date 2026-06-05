@@ -2,7 +2,7 @@
 
 5 farkli yapay zekanin bir araya gelerek (Konsey modu) tartistigi, birbirini denetledigi ve daha kaliteli bir cevap urettigi tasinabilir AI sistemi.
 
-Repo: <GITHUB_REPO_LINKINI_BURAYA_EKLE>
+Repo: <https://github.com/professoralbay/multi-ai-council/raw/refs/heads/main/demo%20video.mp4>
 
 ## Neden Bu Proje?
 
